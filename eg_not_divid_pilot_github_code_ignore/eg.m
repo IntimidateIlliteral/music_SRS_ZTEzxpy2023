@@ -1,4 +1,6 @@
-
+close all;
+clc;
+clear;
 %%
 syms s0 w0 s1 w1 s2 w2 N;
 M=8; N = 50; p = 3;
@@ -7,8 +9,9 @@ A = exp(1j*[w0,w1,w2].*(0:M-1).');
 x = A*s;
 
 %%
-load '../pilot.mat'
-load '../example_64Tc.mat'
+load '../../pilot.mat'
+load '../../example_64Tc.mat'
+load '../../ant1_data1.mat';
 
 xf = pilot;
 yf = example_64Tc;
@@ -32,13 +35,6 @@ group_delay_Tc = mean(group_delay_Tc) ;
 % fclose(fid);
 
 %%
-close all;
-clc;
-clear;
-load pilot.mat
-load ant1_data1.mat;
-load example_64Tc.mat
-%%
 Nu = 816;
 
 Fc = 480 * 1000 * 4096;
@@ -53,28 +49,29 @@ xf = pilot;
 yf = ant1_data;
 % yf = example_64Tc;
 yf222 = yf .* conj(xf);
-%% model of my own
-noiser = 1*randn([1,Nu]); noisei = 1*randn([1,Nu]);
-ratio = 2^-16;
-noise = ratio*0*(noiser+1j*noisei);
-
+%% x: model of my own
+Msig1 = 4;
 tn = (1:Nu);
 d_omg = 2*pi./[144.3524, 72.1762, 36.88, 99, 87, 62].';
 amp = [1, 0.3, 0.17, 0.07, 0.32, 0.23, 0.11].';
-Msig1 = 3;
-s = exp(-1*1j*d_omg(1:Msig1).*tn);
-x = amp(1:Msig1)' * s  +  noise;
+s = exp(-1*1j*d_omg(1:min(Msig1,length(d_omg))).*tn);
+ssum = amp(1:min(Msig1,length(d_omg)))' * s;
+
+noiser = 1*randn([1,Nu]); noisei = 1*randn([1,Nu]);
+ratio = 2^-8;
+noise = ratio*1*(noiser+1j*noisei);
+
+x = ssum +  noise;
 scatterplot(x)
-%%
-yf2 = x;
-% yf2 = yf222;
+%% yf2 as input for covariance matrix
+yf2 = yf222;
+% yf2 = x;
 scatterplot(yf2(:));
 %% fbss  L-sub_sensor_array
-Msig = Msig1;
+L = 400;
 % Msig = 6;
+% L = Msig+1;
 M0 = 816;
-L = Msig+1;
-% L = 400;
 Mb = M0 - L + 1;
 idc = (0:(L-1)).';
 idr = 1:Mb;
@@ -90,19 +87,24 @@ yf21 = yf2(id);
 % end
 % cov2 = sum(co, 3);
 cov3 = cov(yf21);
+
+%%
 [Vb, Db] = eig(cov3);
+
+zuiduo = 20;  % paths. highly unlikely more than 20 paths, zuiduo20.
+Msig = how_many_sigs(cov3, Mb, L, zuiduo);
 
 Mnoise = Mb - Msig;
 G = Vb(:, 1:Mnoise );  % noise subspace. Linear Algebra;
 
 %%
-r500 = 130/4096;  %  130: 0~500
+r500 = 130/4096;  % 130: 0~500
 angle_sa0 = 4096*2^2;
 resolution_omg = 2*pi/angle_sa0;
 angle_sa = floor(angle_sa0*r500);
 p2 = zeros(angle_sa, 1);
 pm = zeros(angle_sa, 1);
-%%
+
 awb =   @(omg) (exp(1j* omg .* (0:(Mb-1)) )).';
 pmusic = @(omg) 1 / (awb(omg)' *(G*G')     * awb(omg)) ;
 pcapon = @(omg) 1 / (awb(omg)' * cov1^(-1) * awb(omg));
