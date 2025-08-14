@@ -90,6 +90,9 @@ cov3 = cov(yf21);
 
 %%
 [Vb, Db] = eig(cov3);
+los1 = Vb(:,end);
+scatterplot(los1); grid on;
+los1omgd = mean(diff(unwrap(angle(los1))));
 
 zuiduo = 20;  % paths. highly unlikely more than 20 paths, zuiduo20.
 Msig = how_many_sigs(cov3, Mb, L, zuiduo);
