@@ -49,13 +49,20 @@ xf = pilot;
 yf = ant1_data;
 % yf = example_64Tc;
 yf222 = yf .* conj(xf);
+%%
+toggle_use_your_own_model = 0;
 %% x: model of my own
-Msig1 = 4;
+Msig1 = 2;
 tn = (1:Nu);
-d_omg = 2*pi./[144.3524, 72.1762, 36.88, 99, 87, 62].';
-amp = [1, 0.3, 0.17, 0.07, 0.32, 0.23, 0.11].';
-s = exp(-1*1j*d_omg(1:min(Msig1,length(d_omg))).*tn);
-ssum = amp(1:min(Msig1,length(d_omg)))' * s;
+d_omg = 2*pi ./ [144.3524, 72.1762, 36.88, 99, 87, 62].';
+% mildly alter the d_omg of LOS, i.e. d_omg(1), by 1e-3 or so.
+% to verify remaining issue 1
+mild = 516*2^8*1e-7;  % 416~516~616
+d_omg(1) = d_omg(1)*(1 + mild);
+amp = [1, 0.17, 0.11, 0.07, 0.32, 0.23, 0.11].';
+Msig2 = min(Msig1,length(d_omg));
+s = exp(-1*1j*d_omg(1:Msig2).*tn);
+ssum = amp(1:Msig2)' * s;
 
 noiser = 1*randn([1,Nu]); noisei = 1*randn([1,Nu]);
 ratio = 2^-8;
@@ -63,9 +70,14 @@ noise = ratio*1*(noiser+1j*noisei);
 
 x = ssum +  noise;
 scatterplot(x)
+
 %% yf2 as input for covariance matrix
-yf2 = yf222;
-% yf2 = x;
+if toggle_use_your_own_model == 1
+    yf2 = x;
+else
+    yf2 = yf222;
+end
+
 scatterplot(yf2(:));
 %% fbss  L-sub_sensor_array
 L = 400;
@@ -127,4 +139,3 @@ Tcnm = resolution_omg*(mpm-1)/(2*pi * 4 * srs_spacing)/Tc;
 
 figure; plot(pm);     hold on; plot([113+1, mpm+1],pm([113+1, mpm+1]),'x')
 figure; semilogy(pm); hold on; plot([113+1, mpm+1],pm([113+1, mpm+1]),'x')
-
