@@ -9,11 +9,16 @@ A = exp(1j*[w0,w1,w2].*(0:M-1).');
 x = A*s;
 
 %%
-load '../../pilot.mat'
-load '../../example_64Tc.mat'
-load '../../ant1_data1.mat';
+load '../data1/pilot.mat'
+load '../data1/example_64Tc.mat'
+
+data_id_you_want = 334;  % dataSet 1~400
+% a = ['../data1/ant1_data', '333', '.mat'];
+a = strcat('../data1/ant1_data', string(data_id_you_want), '.mat');
+load(a);
 
 xf = pilot;
+%%
 yf = example_64Tc;
 
 n=4096;n1=816;
@@ -113,10 +118,10 @@ Mnoise = Mb - Msig;
 G = Vb(:, 1:Mnoise );  % noise subspace. Linear Algebra;
 
 %%
-r500 = 130/4096;  % 130: 0~500
-angle_sa0 = 4096*2^2;
+r600 = 160/4096;  % 160: 0~600 Tc
+angle_sa0 = 4096*2^4;
 resolution_omg = 2*pi/angle_sa0;
-angle_sa = floor(angle_sa0*r500);
+angle_sa = floor(angle_sa0*r600);
 p2 = zeros(angle_sa, 1);
 pm = zeros(angle_sa, 1);
 
@@ -128,6 +133,7 @@ for id = 0:(-1+angle_sa)
     pm(id+1) = pmusic(dphase);
 end
 pm = abs(pm);
+% todo: use findpeaks() instead
 dpm = diff(pm);
 l = length(dpm);
 dpm = (dpm(1:(l-1))>0) .* (dpm(2:l))<0;

@@ -1,6 +1,7 @@
 # music_SRS_ZTEzxpy2023
 
-估计上行SRS信号los径的 群时延/相位差
+contact me 1960851445@qq.com if you have anything instresting
+##估计上行SRS信号los径的 群时延/相位差
 
 输入：数据集：单天线接收的 5g上行一个ofdm符号内 频域SRS信号 816*1；  
 输出：los径群时延与常数Tc的比值
