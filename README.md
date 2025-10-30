@@ -1,8 +1,8 @@
 # music_SRS_ZTEzxpy2023
 
 contact me 1960851445@qq.com if you have anything instresting
-##估计上行SRS信号los径的 群时延/相位差
 
+##估计上行SRS信号los径的 群时延/相位差
 输入：数据集：单天线接收的 5g上行一个ofdm符号内 频域SRS信号 816*1；  
 输出：los径群时延与常数Tc的比值
 
@@ -13,6 +13,8 @@ contact me 1960851445@qq.com if you have anything instresting
 ### toggle_use_your_own_model：置为0时使用load的ant1_data
 ### 1 多径谱峰相对高低有问题——按说应该los的峰（最左侧峰）是最高的？为何实际plot是中间某一个nlos的峰最高？
 	难道是因为搜索间隔精度不够，没对齐？--verified. 阶段性成果  
+	1.0注意，在一个地方（CSDN）看到：music搜的峰，仅峰值点有意义而峰值无意义——多个峰的峰值大小，跟信号幅度/能量/功率无关
+	原文大概是“music谱是非线性谱，即多个峰相对大小不反映对应方向信号的强度”
 	1.1 可初步确定是，间隔过大导致没有真正对齐尖峰——此时的峰只是实际尖峰的“半山腰”  
 	1.2 间隔大到稍极端的情况下，可能导致漏掉峰——间隔太大，只有两个山脚，连山腰都没看到  
 	1.3 间隔当然可以设定成很小，但计算量与间隔反比  
