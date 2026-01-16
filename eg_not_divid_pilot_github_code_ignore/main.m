@@ -2,6 +2,9 @@ close all;
 clc;
 clear;
 %%
+set_NRparameters
+
+%%
 syms s0 w0 s1 w1 s2 w2 N;
 M=8; N = 50; p = 3;
 s = [s0;s1;s2];
@@ -10,28 +13,9 @@ x = A*s;
 
 %%
 load '../data1/pilot.mat'
-load '../data1/example_64Tc.mat'
 
 data_id_you_want = 1;  % dataSet 1~400
-% a = ['../data1/ant1_data', '333', '.mat'];
-a = strcat('../data1/ant1_data', string(data_id_you_want), '.mat');
-load(a);
-
-xf = pilot;
-%%
-yf = example_64Tc;
-
-n=4096;n1=816;
-Tc = 1/(480 * 1000 * 4096);  % second
-
-srs_spacing = 30e+3;         % subcarrier_spacing 30KHz
-
-delta_phase = angle(yf ./ xf);     
-delta_phase = unwrap(delta_phase);  
-
-group_delay = -1 * diff(delta_phase) / (2*pi * 4 * srs_spacing);
-group_delay_Tc = group_delay / Tc ;
-group_delay_Tc = mean(group_delay_Tc) ;
+load(strcat('../data1/ant1_data', string(data_id_you_want), '.mat'));
 
 %% output_
 
@@ -40,25 +24,14 @@ group_delay_Tc = mean(group_delay_Tc) ;
 % fclose(fid);
 
 %%
-Nu = 816;
-
-Fc = 480 * 1000 * 4096;
-Tc = 1/Fc;  % second
-
-srs_spacing = 30e+3;         % subcarrier_spacing 30KHz
-
-F = 122.88e6; % Hz
-
-%%
 xf = pilot;
 yf = ant1_data;
-% yf = example_64Tc;
 yf222 = yf .* conj(xf);
 %%
-toggle_use_your_own_model = 0;
+toggle_use_model_of_your_own = 0;
 %% x: model of my own
 Msig1 = 2;
-tn = (1:Nu);
+tn = (1:NSRScomb4);
 d_omg = 2*pi ./ [144.3524, 72.1762, 36.88, 99, 87, 62].';
 % mildly alter the d_omg of LOS, i.e. d_omg(1), by 1e-3 or so.
 % to verify remaining issue 1
@@ -69,7 +42,7 @@ Msig2 = min(Msig1,length(d_omg));
 s = exp(-1*1j*d_omg(1:Msig2).*tn);
 ssum = amp(1:Msig2)' * s;
 
-noiser = 1*randn([1,Nu]); noisei = 1*randn([1,Nu]);
+noiser = 1*randn([1,NSRScomb4]); noisei = 1*randn([1,NSRScomb4]);
 ratio = 2^-8;
 noise = ratio*1*(noiser+1j*noisei);
 
@@ -77,7 +50,7 @@ x = ssum +  noise;
 scatterplot(x)
 
 %% yf2 as input for covariance matrix
-if toggle_use_your_own_model == 1
+if toggle_use_model_of_your_own == 1
     yf2 = x;
 else
     yf2 = yf222;
@@ -143,7 +116,7 @@ jidazhidian = 1+find(dpm==1);
 [b, i] = sort(pm(jidazhidian), 'descend');
 jidazhidian = jidazhidian(i(1:Msig));
 mpm = min(jidazhidian);
-Tcnm = resolution_omg*(mpm-1)/(2*pi * 4 * srs_spacing)/Tc;
+Tcnm = resolution_omg*(mpm-1)/(2*pi * subcarrier_each_comb * subcarrier_spacing)/Tc;
 
 figure; plot(pm);     hold on; plot([ mpm],pm([ mpm]),'x')
 figure; semilogy(pm); hold on; plot([ mpm],pm([ mpm]),'x')
