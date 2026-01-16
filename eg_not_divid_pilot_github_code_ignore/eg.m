@@ -12,7 +12,7 @@ x = A*s;
 load '../data1/pilot.mat'
 load '../data1/example_64Tc.mat'
 
-data_id_you_want = 334;  % dataSet 1~400
+data_id_you_want = 1;  % dataSet 1~400
 % a = ['../data1/ant1_data', '333', '.mat'];
 a = strcat('../data1/ant1_data', string(data_id_you_want), '.mat');
 load(a);
@@ -119,7 +119,7 @@ G = Vb(:, 1:Mnoise );  % noise subspace. Linear Algebra;
 
 %%
 r600 = 160/4096;  % 160: 0~600 Tc
-angle_sa0 = 4096*2^4;
+angle_sa0 = 4096*2^2;
 resolution_omg = 2*pi/angle_sa0;
 angle_sa = floor(angle_sa0*r600);
 p2 = zeros(angle_sa, 1);
@@ -127,6 +127,8 @@ pm = zeros(angle_sa, 1);
 
 awb =   @(omg) (exp(1j* omg .* (0:(Mb-1)) )).';
 pmusic = @(omg) 1 / (awb(omg)' *(G*G')     * awb(omg)) ;
+
+
 pcapon = @(omg) 1 / (awb(omg)' * cov1^(-1) * awb(omg));
 for id = 0:(-1+angle_sa)
     dphase = id * resolution_omg;
@@ -143,5 +145,5 @@ jidazhidian = jidazhidian(i(1:Msig));
 mpm = min(jidazhidian);
 Tcnm = resolution_omg*(mpm-1)/(2*pi * 4 * srs_spacing)/Tc;
 
-figure; plot(pm);     hold on; plot([113+1, mpm+1],pm([113+1, mpm+1]),'x')
-figure; semilogy(pm); hold on; plot([113+1, mpm+1],pm([113+1, mpm+1]),'x')
+figure; plot(pm);     hold on; plot([ mpm],pm([ mpm]),'x')
+figure; semilogy(pm); hold on; plot([ mpm],pm([ mpm]),'x')

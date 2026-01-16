@@ -7,10 +7,12 @@ contact me 1960851445@qq.com if you have anything instresting
 输出：los径群时延与常数Tc的比值
 
 ## 遗留问题：issues remaining/remaining issues
+
 ### 0 平滑解相干，平滑数L如何确定/如何找到合适的平滑数L？
 	应该是需要估计信噪比，信噪比映射L
 
 ### toggle_use_your_own_model：置为0时使用load的ant1_data
+
 ### 1 多径谱峰相对高低有问题——按说应该los的峰（最左侧峰）是最高的？为何实际plot是中间某一个nlos的峰最高？
 	难道是因为搜索间隔精度不够，没对齐？--verified. 阶段性成果  
 	1.0注意，在一个地方（CSDN）看到：music搜的峰，仅峰值点有意义而峰值无意义——多个峰的峰值大小，跟信号幅度/能量/功率无关
