@@ -25,34 +25,24 @@ load(strcat('../data1/ant1_data', string(data_id_you_want), '.mat'));
 
 %%
 xf = pilot;
-yf = ant1_data;
-yf222 = yf .* conj(xf);
-%%
-toggle_use_model_of_your_own = 0;
-%% x: model of my own
-Msig1 = 2;
-tn = (1:NSRScomb4);
-d_omg = 2*pi ./ [144.3524, 72.1762, 36.88, 99, 87, 62].';
-% mildly alter the d_omg of LOS, i.e. d_omg(1), by 1e-3 or so.
-% to verify remaining issue 1
-mild = 516*2^8*1e-7;  % 416~516~616
-d_omg(1) = d_omg(1)*(1 + mild);
-amp = [1, 0.17, 0.11, 0.07, 0.32, 0.23, 0.11].';
-Msig2 = min(Msig1,length(d_omg));
-s = exp(-1*1j*d_omg(1:Msig2).*tn);
-ssum = amp(1:Msig2)' * s;
-
-noiser = 1*randn([1,NSRScomb4]); noisei = 1*randn([1,NSRScomb4]);
-ratio = 2^-8;
-noise = ratio*1*(noiser+1j*noisei);
-
-x = ssum +  noise;
-scatterplot(x)
-
+%
+toggle_yf_use_model_of_your_own = 0;
 %% yf2 as input for covariance matrix
-if toggle_use_model_of_your_own == 1
-    yf2 = x;
+if toggle_yf_use_model_of_your_own == 1
+    %% x: model of my own
+    Msig1 = 2;
+    d_omg = 2*pi ./ [144.3524, 72.1762, 36.88, 99, 87, 62].';
+    % mildly alter the d_omg of LOS, i.e. d_omg(1), by 1e-3 or so.
+    % to verify remaining issue 1
+    mild = 516*2^8*1e-7;  % 416~516~616
+    d_omg(1) = d_omg(1)*(1 + mild);
+    amp = [1, 0.17, 0.11, 0.07, 0.32, 0.23, 0.11].';
+
+    yf2 = my_own_model4MUSICinput(Msig1, d_omg, amp, NSRScomb4);
+    scatterplot(yf2)
 else
+    yf = ant1_data;
+    yf222 = yf .* conj(xf);
     yf2 = yf222;
 end
 
@@ -66,6 +56,7 @@ Mb = M0 - L + 1;
 idc = (0:(L-1)).';
 idr = 1:Mb;
 id = idc+idr;
+%id = fbssIDmatrix();
 yf21 = yf2(id);
 % cov1 = yf21*yf21';
 % y1 = zeros(L,Mb);
@@ -87,8 +78,9 @@ los1omgd = mean(diff(unwrap(angle(los1))));
 zuiduo = 20;  % paths. highly unlikely more than 20 paths, zuiduo20.
 Msig = how_many_sigs(cov3, Mb, L, zuiduo);
 
+%%
 Mnoise = Mb - Msig;
-G = Vb(:, 1:Mnoise );  % noise subspace. Linear Algebra;
+G = Vb(:, 1:Mnoise );  % Null_space = noise_subspace. Linear Algebra;
 
 %%
 r600 = 160/4096;  % 160: 0~600 Tc
@@ -116,7 +108,8 @@ jidazhidian = 1+find(dpm==1);
 [b, i] = sort(pm(jidazhidian), 'descend');
 jidazhidian = jidazhidian(i(1:Msig));
 mpm = min(jidazhidian);
+%%
 Tcnm = resolution_omg*(mpm-1)/(2*pi * subcarrier_each_comb * subcarrier_spacing)/Tc;
-
+%%
 figure; plot(pm);     hold on; plot([ mpm],pm([ mpm]),'x')
 figure; semilogy(pm); hold on; plot([ mpm],pm([ mpm]),'x')
