@@ -3,14 +3,6 @@ clc;
 clear;
 %%
 set_NRparameters
-
-%%
-syms s0 w0 s1 w1 s2 w2 N;
-M=8; N = 50; p = 3;
-s = [s0;s1;s2];
-A = exp(1j*[w0,w1,w2].*(0:M-1).');
-x = A*s;
-
 %%
 load '../data1/pilot.mat'
 
@@ -51,42 +43,28 @@ scatterplot(yf2(:));
 L = 400;
 % Msig = 6;
 % L = Msig+1;
-M0 = 816;
-Mb = M0 - L + 1;
-idc = (0:(L-1)).';
-idr = 1:Mb;
-id = idc+idr;
-%id = fbssIDmatrix();
-yf21 = yf2(id);
-% cov1 = yf21*yf21';
-% y1 = zeros(L,Mb);
-% co = zeros(Mb,Mb,L);
-% for idc = 0:(-1+L)
-%     y1(idc+1,:) = yf2(idc+idr);
-%     t = y1(idc+1,:).';
-%     co(:,:,idc+1) = t*t';
-% end
-% cov2 = sum(co, 3);
-cov3 = cov(yf21);
+yf2_fbss = fbssMy(yf2, L);
+sampleCovarianceMatrix = cov(yf2_fbss);
 
 %%
-[Vb, Db] = eig(cov3);
+[Vb, Db] = eig(sampleCovarianceMatrix);
 los1 = Vb(:,end);
 scatterplot(los1); grid on;
 los1omgd = mean(diff(unwrap(angle(los1))));
 
+[L, Mb] = size(yf2_fbss);
 zuiduo = 20;  % paths. highly unlikely more than 20 paths, zuiduo20.
-Msig = how_many_sigs(cov3, Mb, L, zuiduo);
+Msig = how_many_sigs(sampleCovarianceMatrix, Mb, L, zuiduo);
 
 %%
 Mnoise = Mb - Msig;
 G = Vb(:, 1:Mnoise );  % Null_space = noise_subspace. Linear Algebra;
 
 %%
-r600 = 160/4096;  % 160: 0~600 Tc
+up_boundary600 = 160/4096;  % 160: 0~600 Tc
 angle_sa0 = 4096*2^2;
 resolution_omg = 2*pi/angle_sa0;
-angle_sa = floor(angle_sa0*r600);
+angle_sa = floor(angle_sa0*up_boundary600);
 p2 = zeros(angle_sa, 1);
 pm = zeros(angle_sa, 1);
 
@@ -101,6 +79,7 @@ for id = 0:(-1+angle_sa)
 end
 pm = abs(pm);
 % todo: use findpeaks() instead
+% todo: find first Msig peaks
 dpm = diff(pm);
 l = length(dpm);
 dpm = (dpm(1:(l-1))>0) .* (dpm(2:l))<0;
