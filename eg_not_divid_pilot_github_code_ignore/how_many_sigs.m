@@ -1,13 +1,12 @@
-function q_sig = how_many_sigs(covMatrix, Mb, N, upper_boundary)
+function q_sig = how_many_sigs(E, Mb, N, upper_boundary)
 % output: 
 %   q_sig:          scalar, how many signals est. for the input covMatrix.
 % input:
-%   covMatrix:      1-by-1 matrix, the sample-covariance matrix.
+%   E:              column_vector, eigenvalues of the sample-covariance matrix.
 %   upper_boundary: scalar, for q_sig.
 
 %% 《DETECTION OF SIGNALS BY INFORMATION THEORETIC CRITERIA》
 p = Mb;
-E = eig(covMatrix);
 E = sort(E, 'descend');
 
 ratio2mean = @(k) geomean( abs(E(k+1 : p)) ) / ...
