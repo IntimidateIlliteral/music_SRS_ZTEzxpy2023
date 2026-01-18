@@ -1,11 +1,11 @@
 function q_sig = how_many_sigs(E, Mb, N, upper_boundary)
-% output: 
+%% 《DETECTION OF SIGNALS BY INFORMATION THEORETIC CRITERIA》信源数估计
+% output:
 %   q_sig:          scalar, how many signals est. for the input covMatrix.
 % input:
 %   E:              column_vector, eigenvalues of the sample-covariance matrix.
 %   upper_boundary: scalar, for q_sig.
 
-%% 《DETECTION OF SIGNALS BY INFORMATION THEORETIC CRITERIA》
 p = Mb;
 E = sort(E, 'descend');
 

@@ -1,5 +1,5 @@
 function jidazhidian = findJiDaZhiDianMy(pm)
-
+% findpeaks()
 dpm = diff(pm);  % derivative
 
 l = length(dpm);

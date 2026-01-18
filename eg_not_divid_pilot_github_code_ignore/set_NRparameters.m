@@ -1,7 +1,7 @@
 
 
 %% NR parameters
-% time unit
+%% NR time unit
 Fc = 480 * 1000 * 4096;
 Tc = 1/Fc;  % second
 

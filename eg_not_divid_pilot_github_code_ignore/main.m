@@ -66,7 +66,6 @@ up_boundary600 = 160/4096;  % 160: 0~600 Tc
 angle_sa0 = 4096*2^2;
 resolution_omg = 2*pi/angle_sa0;
 angle_sa = floor(angle_sa0*up_boundary600);
-p2 = zeros(angle_sa, 1);
 pm = zeros(angle_sa, 1);
 
 for id = 0:(-1+angle_sa)
@@ -75,7 +74,7 @@ for id = 0:(-1+angle_sa)
 end
 pm = abs(pm);
 
-% todo: use builtIn findpeaks()
+% findpeaks()
 jidazhidian = findJiDaZhiDianMy(pm);
 
 [b, i] = sort(pm(jidazhidian), 'descend');
@@ -83,7 +82,12 @@ jidazhidian = jidazhidian(i(1:Msig_est));  % highest Msig_est peaks
 
 mpm = min(jidazhidian);
 %%
-Tcnm = resolution_omg*(mpm-1)/(2*pi * subcarrier_each_comb * subcarrier_spacing)/Tc;
+dPhase = resolution_omg*(mpm-1);  % todo: why -1? Differs little whether -1 or not, if resolution is so high
+dOmega = (2*pi * subcarrier_each_comb * subcarrier_spacing);
+
+group_delay = dPhase/dOmega;
+
+group_delay_Tc = group_delay / Tc;
 %%
 figure; plot(pm);     hold on; plot([ mpm],pm([ mpm]),'x')
 figure; semilogy(pm); hold on; plot([ mpm],pm([ mpm]),'x')
