@@ -74,8 +74,10 @@ for id = 0:(-1+angle_sa)
     pm(id+1) = pMusic(dphase);
 end
 pm = abs(pm);
-% todo: use findpeaks() instead
+
+% todo: use builtIn findpeaks()
 jidazhidian = findJiDaZhiDianMy(pm);
+
 [b, i] = sort(pm(jidazhidian), 'descend');
 jidazhidian = jidazhidian(i(1:Msig_est));  % highest Msig_est peaks
 
