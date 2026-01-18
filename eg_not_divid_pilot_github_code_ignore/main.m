@@ -12,7 +12,7 @@ set_NRparameters
 load '../data1/pilot.mat'
 xf = pilot;  % NR upLink SRS, ZC sequence
 %
-toggle_yf_use_model_of_your_own = 0;
+toggle_yf_use_model_of_your_own = 1;
 if toggle_yf_use_model_of_your_own
     %% x: model of my own
     MsigMy = 3;
@@ -62,32 +62,34 @@ pCapon = @(omg) 1 / (awb(omg)' * cov1^(-1) * awb(omg));
 pMusic = @(omg) 1 / (awb(omg)' *(G*G')     * awb(omg)) ;
 
 %
+num_angle_sa0 = 4096*2^2;
+angle_resolution = 2*pi/num_angle_sa0;
+
 up_boundary600 = 160/4096;  % 160: 0~600 Tc
-angle_sa0 = 4096*2^2;
-resolution_omg = 2*pi/angle_sa0;
-angle_sa = floor(angle_sa0*up_boundary600);
-pm = zeros(angle_sa, 1);
 
-for id = 0:(-1+angle_sa)
-    dphase = id * resolution_omg;
-    pm(id+1) = pMusic(dphase);
+num_angle_sa = floor(num_angle_sa0*up_boundary600);
+
+pmusic_est = zeros(num_angle_sa, 1);
+
+for thisAngleID = 0:(-1+num_angle_sa)
+    thisAngle = thisAngleID * angle_resolution;
+    pmusic_est(1+thisAngleID) = pMusic(thisAngle);
 end
-pm = abs(pm);
+pmusic_est = abs(pmusic_est);
 
-% findpeaks()
-jidazhidian = findJiDaZhiDianMy(pm);
+jidazhidian = findJiDaZhiDianMy(pmusic_est);
 
-[b, i] = sort(pm(jidazhidian), 'descend');
+[b, i] = sort(pmusic_est(jidazhidian), 'descend');
 jidazhidian = jidazhidian(i(1:Msig_est));  % highest Msig_est peaks
 
-mpm = min(jidazhidian);
-%%
-dPhase = resolution_omg*(mpm-1);  % todo: why -1? Differs little whether -1 or not, if resolution is so high
+mpm_LOS = min(jidazhidian);  % first_peak -> first_path -> LOS_path
+%% for LOS_path
+dPhase = angle_resolution*(mpm_LOS-1);  % todo: why -1? Differs little whether -1 or not, if resolution is so high
 dOmega = (2*pi * subcarrier_each_comb * subcarrier_spacing);
 
 group_delay = dPhase/dOmega;
 
 group_delay_Tc = group_delay / Tc;
 %%
-figure; plot(pm);     hold on; plot([ mpm],pm([ mpm]),'x')
-figure; semilogy(pm); hold on; plot([ mpm],pm([ mpm]),'x')
+figure; plot(pmusic_est);     hold on; plot([ mpm_LOS],pmusic_est([ mpm_LOS]),'x')
+figure; semilogy(pmusic_est); hold on; plot([ mpm_LOS],pmusic_est([ mpm_LOS]),'x')
