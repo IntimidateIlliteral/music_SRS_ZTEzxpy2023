@@ -32,6 +32,7 @@ else
 end
 %% yf2 as input for covariance matrix
 scatterplot(yf2(:));
+
 %% fbss  L-sub_sensor_array
 L = 400;
 % Msig = 6;
@@ -40,7 +41,6 @@ yf2_fbss = fbssMy(yf2, L);
 [L, Mb] = size(yf2_fbss);
 
 sampleCovarianceMatrix = cov(yf2_fbss);
-
 %%
 [Vb, Db] = eig(sampleCovarianceMatrix);
 %% todo: check if the 1st eigenvector is the LOS, the relationship
@@ -56,6 +56,12 @@ Mnoise = Mb - Msig_est;
 G = Vb(:, 1:Mnoise );  % Null_space = noise_subspace. Linear Algebra;
 
 %%
+%
+awb =   @(omg) (exp(1j* omg .* (0:(Mb-1)) )).';
+pCapon = @(omg) 1 / (awb(omg)' * cov1^(-1) * awb(omg));
+pMusic = @(omg) 1 / (awb(omg)' *(G*G')     * awb(omg)) ;
+
+%
 up_boundary600 = 160/4096;  % 160: 0~600 Tc
 angle_sa0 = 4096*2^2;
 resolution_omg = 2*pi/angle_sa0;
@@ -63,22 +69,16 @@ angle_sa = floor(angle_sa0*up_boundary600);
 p2 = zeros(angle_sa, 1);
 pm = zeros(angle_sa, 1);
 
-%
-awb =   @(omg) (exp(1j* omg .* (0:(Mb-1)) )).';
-pCapon = @(omg) 1 / (awb(omg)' * cov1^(-1) * awb(omg));
-pMusic = @(omg) 1 / (awb(omg)' *(G*G')     * awb(omg)) ;
-
 for id = 0:(-1+angle_sa)
     dphase = id * resolution_omg;
     pm(id+1) = pMusic(dphase);
 end
 pm = abs(pm);
 % todo: use findpeaks() instead
-% todo: find highest Msig peaks
 jidazhidian = findJiDaZhiDianMy(pm);
-
 [b, i] = sort(pm(jidazhidian), 'descend');
-jidazhidian = jidazhidian(i(1:Msig_est));
+jidazhidian = jidazhidian(i(1:Msig_est));  % highest Msig_est peaks
+
 mpm = min(jidazhidian);
 %%
 Tcnm = resolution_omg*(mpm-1)/(2*pi * subcarrier_each_comb * subcarrier_spacing)/Tc;
