@@ -15,5 +15,7 @@ toggle_yf_use_model_of_your_own = linux_input_toggle;
 
 
 %%
-figure; plot(pmusic_est);     hold on; plot([ mpm_LOS],pmusic_est([ mpm_LOS]),'x')
-figure; semilogy(pmusic_est); hold on; plot([ mpm_LOS],pmusic_est([ mpm_LOS]),'x')
+p1save = strcat('pmusic_est', string(data_id_you_want));
+g1save = strcat('group_delay_Tc', string(data_id_you_want));
+save(p1save, 'pmusic_est');
+save(p1save, 'group_delay_Tc');
