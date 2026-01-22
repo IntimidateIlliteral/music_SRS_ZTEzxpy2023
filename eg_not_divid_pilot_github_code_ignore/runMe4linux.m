@@ -3,7 +3,7 @@
 %%
 close all;
 clc;
-clear;
+% clear;
 addpath(genpath('../'))
 
 %% 右边变量，在sh脚本中赋值.
@@ -18,4 +18,5 @@ toggle_yf_use_model_of_your_own = linux_input_toggle;
 p1save = strcat('pmusic_est', string(data_id_you_want));
 g1save = strcat('group_delay_Tc', string(data_id_you_want));
 save(p1save, 'pmusic_est');
-save(p1save, 'group_delay_Tc');
+save(g1save, 'group_delay_Tc');
+disp(group_delay_Tc);
