@@ -1,7 +1,5 @@
-close all;
-clc;
-clear;
-addpath(genpath('../'))
+function [pmusic_est, group_delay_Tc, mpm_LOS] = main(data_id_you_want, toggle_yf_use_model_of_your_own)
+% PCA, Principal Component Analysis
 %% output_
 % fid = fopen('delay_test.txt','w');
 % fprintf(fid,'%.2f,\n', group_delay);
@@ -9,10 +7,10 @@ addpath(genpath('../'))
 %%
 set_NRparameters
 %% load data
-load '../data1/pilot.mat'
+load ('../data1/pilot.mat', 'pilot')
 xf = pilot;  % NR upLink SRS, ZC sequence
 %
-toggle_yf_use_model_of_your_own = 1;
+% toggle_yf_use_model_of_your_own = 1;
 if toggle_yf_use_model_of_your_own
     %% x: model of my own
     MsigMy = 3;
@@ -25,13 +23,13 @@ if toggle_yf_use_model_of_your_own
 
     yf2 = my_own_model4MUSICinput(MsigMy, d_omg, amp, NSRScomb4);
 else
-    data_id_you_want = 1;  % dataSet 1~400
-    load(strcat('../data1/ant1_data', string(data_id_you_want), '.mat'));
+    % data_id_you_want = 1;  % dataSet 1~400
+    load(strcat('../data1/ant1_data', string(data_id_you_want), '.mat'), 'ant1_data');
     yf = ant1_data;
     yf2 = yf .* conj(xf);
 end
 %% yf2 as input for covariance matrix
-scatterplot(yf2(:));
+% scatterplot(yf2(:));
 
 %% fbss  L-sub_sensor_array
 L = 400;
@@ -45,7 +43,7 @@ sampleCovarianceMatrix = cov(yf2_fbss);
 [Vb, Db] = eig(sampleCovarianceMatrix);
 %% todo: check if the 1st eigenvector is the LOS, the relationship
 los1 = Vb(:, end);
-scatterplot(los1); grid on;
+% scatterplot(los1); grid on;
 los1omgd = mean(diff(unwrap(angle(los1))));
 
 %%
@@ -69,6 +67,7 @@ up_boundary600 = 160/4096;  % 160: 0~600 Tc
 
 num_angle_sa = floor(num_angle_sa0*up_boundary600);
 
+%
 pmusic_est = zeros(num_angle_sa, 1);
 
 for thisAngleID = 0:(-1+num_angle_sa)
@@ -90,6 +89,5 @@ dOmega = (2*pi * subcarrier_each_comb * subcarrier_spacing);
 group_delay = dPhase/dOmega;
 
 group_delay_Tc = group_delay / Tc;
-%%
-figure; plot(pmusic_est);     hold on; plot([ mpm_LOS],pmusic_est([ mpm_LOS]),'x')
-figure; semilogy(pmusic_est); hold on; plot([ mpm_LOS],pmusic_est([ mpm_LOS]),'x')
+
+end
