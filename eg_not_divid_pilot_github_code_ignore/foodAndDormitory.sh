@@ -1,4 +1,12 @@
 
+
+NUM_INSTANCES=3
+for ((input0=1; input0<=$NUM_INSTANCES; input0++)); do
+    cp -r ../polar ../polar$input0
+done
+
+
+
 # source "$HOME/.bashrc"
 # bash ./foodAndDormitory.sh
 
