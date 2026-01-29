@@ -1,10 +1,14 @@
 # music_SRS_ZTEzxpy2023, 估计5g上行SRS信号los径的 群时延/相位差。
 
-输出：los径群时延与常数Tc的比值  
-输入：数据集：单天线接收的 5g上行一个ofdm符号内 频域SRS信号，复向量 816*1；  
+输出：group_delay_Tc = los径群时延与常数Tc的比值(Tc是5g的Tc);  
+输入：ant1_data      = 数据集：单天线接收的 5g上行一个ofdm符号内 频域SRS信号，复向量 816*1；  
+运行：runMe4windows.m  
+
 中兴捧月2023，无线算法——完备的输入输出描述在这里
 
-Contact me 1960851445@qq.com if you have anything appealing.
+https://gitee.com/WYH_wudiaoteman/music_SRS_ZTEzxpy2023  
+https://github.com/IntimidateIlliteral/music_SRS_ZTEzxpy2023
+## Contact me on github if you have anything appealing.
 ## 解此问题的唯一关键点：数学模型匹配
 此问题是，单天线，时域多径信号的频域816点。我的第一反应是：单天线怎么玩music？  
 实际上，结论是  
