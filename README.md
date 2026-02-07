@@ -1,16 +1,20 @@
 # music_SRS_ZTEzxpy2023, 估计5g上行SRS信号los径的 群时延/相位差。
 
-输出：los径群时延与常数Tc的比值  
-输入：数据集：单天线接收的 5g上行一个ofdm符号内 频域SRS信号，复向量 816*1；  
+输出：group_delay_Tc = los径群时延与常数Tc的比值(Tc是5g的Tc);  
+输入：ant1_data      = 数据集：单天线接收的 5g上行一个ofdm符号内 频域SRS信号，复向量 816*1；  
+运行：runMe4windows.m  
+
 中兴捧月2023，无线算法——完备的输入输出描述在这里
 
-Contact me 1960851445@qq.com if you have anything appealing.
+https://gitee.com/WYH_wudiaoteman/music_SRS_ZTEzxpy2023  
+https://github.com/IntimidateIlliteral/music_SRS_ZTEzxpy2023
+## Contact me on github, should you have anything appealing.
 ## 解此问题的唯一关键点：数学模型匹配
 此问题是，单天线，时域多径信号的频域816点。我的第一反应是：单天线怎么玩music？  
 实际上，结论是  
 【单天线+多径+频域816点 --> 首径群时延】，等价于  
 【816天线ULA+接收多个信号信源+一次快拍 --> 其中最小的到达角】  
-数学模型，数学公式，是完全相同的。只是公式中变量的符号不同。
+数学语言，数学模型，数学公式，是完全相同的。只是公式中变量的符号不同。
 
 ## 当前存在遗留问题：issues remaining/remaining issues
 
@@ -28,6 +32,8 @@ Contact me 1960851445@qq.com if you have anything appealing.
 1.5 注意还可能有别的无意义小峰（极大值点），不能跟LOS峰混了——极大值点峰值排序取前Msig个，LOS的峰需要比这些小峰高。  
 需要解决：如何确定尽可能大的粗搜索间隔/精度，使之能保证至少搜到LOS的半山腰（别给漏了，也不能混）？  
 此间隔可称为“极大可辨峰间隔”
+
+### 2 ofdm任意采样率波形，与resample()波形
 
 ## 目前看已解决问题：func how_many_sigs()输出信源数（最大似然描述所需序列个数）
 1 MDL信源数估计，估计出信源数Msig  
